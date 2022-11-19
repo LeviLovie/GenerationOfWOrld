@@ -4,4 +4,6 @@ game:
 
 dev:
 	@echo "Starting..."
-	@java src/Main.java
+	@cd src/
+	@java Main.java Window/Window.java
+	@cd ../

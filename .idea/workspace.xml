@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9f85a21f-f203-4375-9311-49fdcf3a1c45" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Window.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/game.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Window.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Window.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,13 +46,23 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Groovy&quot;
   }
 }</component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.dev">
+    <configuration name="dev" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="GenerationOfWOrld" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="dev" type="DockDockBuildRunConfiguration" factoryName="DockDockBuildRunConfiguration" temporary="true">
       <dockDockBuild makefileFilePath="$PROJECT_DIR$/make.Makefile" dockerfileDir="$PROJECT_DIR$/docker" dockerImageUrl="" isDockerImage="" isDockerfile="" target="dev" envScriptPath="" arguments="">
         <envs />
       </dockDockBuild>
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Application.dev" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
