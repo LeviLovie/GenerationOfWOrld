@@ -1,8 +1,7 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -13,12 +12,17 @@ public class Window extends JPanel {
     private GenerateMethods generateMethods;
 
     public Window() {
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println(GetTime() + ": Created - Window");
         setLayout(null);
 
         world = new World(false, false);
         generateMethods = new GenerateMethods();
-        creatingWorldArray(695, 695);
+        creatingWorldArray(69, 69);
         calculateValuesForScreen();
         world.RandomArray();
 
@@ -30,7 +34,6 @@ public class Window extends JPanel {
         System.out.println(GetTime() + ": Start - timer()");
         Timer timer;
         timer = new Timer(0, e -> {
-            revalidate();
             repaint();
         });
         timer.setRepeats(true);
@@ -52,16 +55,20 @@ public class Window extends JPanel {
 
         JButton DayNightLandWaterGenerate = new JButton("Day-Night Land-Water Generate");
         DayNightLandWaterGenerate.addActionListener(e -> {
-            Color[][] array = generateMethods.dayNightLandWater(this.world.GetWorldArray(), 500);
-            this.world.SetWorldArray(array);
-            calculateValuesForScreen();
+//            Color[][] array = generateMethods.dayNightLandWater(this.world.GetWorldArray(), 500);
+            dayNightLandWaterManager(250);
             revalidate();
         });
         panelDayNight.add(DayNightLandWaterGenerate);
 
         JButton PerlinNoiseLandWaterGenerate = new JButton("Perlin-Noise Land-Water");
         PerlinNoiseLandWaterGenerate.addActionListener(e -> {
-            BufferedImage result = generateMethods.PerlinNoiseLandWater(this.world.GetWorldArray());
+            BufferedImage result = null;
+            try {
+                result = generateMethods.PerlinNoiseLandWater(this.world.GetWorldArray());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
 //            showImageWindow(result, result.getWidth(), result.getHeight());
             Color[][] array = new Color[this.world.GetWorldArray().length][this.world.GetWorldArray()[0].length];
             for (int y = 0; y < result.getHeight(); y++) {
@@ -97,6 +104,32 @@ public class Window extends JPanel {
 
         add(preferences, null);
     }
+    private void dayNightLandWaterManager(int times) {
+        times = 250;
+
+        for (int y = 0; y < this.world.GetWorldArray().length; y++) {
+            for (int x = 0; x < this.world.GetWorldArray()[y].length; x++) {
+                int rand = this.world.rand(0, 2);
+                if (rand == 0) {
+                    this.world.SetToWorldArray(x, y, new Color(0, 0, 0));
+                } else if (rand == 1) {
+                    this.world.SetToWorldArray(x, y, new Color(255, 255, 255));
+                }
+            }
+        }
+        calculateValuesForScreen2();
+        revalidate();
+
+//        try {Thread.sleep(1);} catch (InterruptedException e) {throw new RuntimeException(e);}
+        for (int t = 0; t < times; t++) {
+            Color[][] array = generateMethods.dayNightLandWater(this.world.GetWorldArray());
+//            this.world.Print2(array);
+            this.world.SetWorldArray(array);
+            calculateValuesForScreen2();
+            revalidate();
+        }
+//        try {Thread.sleep(1);} catch (InterruptedException e) {throw new RuntimeException(e);}
+    }
     private int percentRGB(int source) {
         return (source * 255) / 100;
     }
@@ -113,8 +146,12 @@ public class Window extends JPanel {
         frame.setVisible(true);
     }
     private void calculateValuesForScreen() {
-        System.out.println(GetTime() + ": Start - calculateValuesForScreen()");
+//        System.out.println(GetTime() + ": Start - calculateValuesForScreen()");
         tileSize = (int) Math.floor(695 / this.world.GetWorldArray().length);
+        this.worldArray = world.GetWorldArray();
+    }
+    private void calculateValuesForScreen2() {
+//        System.out.println(GetTime() + ": Start - calculateValuesForScreen()");
         this.worldArray = world.GetWorldArray();
     }
     private void creatingWorldArray(int Height, int Width) {
@@ -146,6 +183,9 @@ class World {
     private Color[][] worldArray;
     public Color[][] GetWorldArray() {return worldArray;}
     public void SetWorldArray(Color[][] WorldArray) {this.worldArray = WorldArray;}
+    public void SetToWorldArray(int x, int y, Color value) {
+        this.worldArray[y][x] = value;
+    }
     Random rand;
     public World(boolean create, boolean printResultOfCreating) {
         System.out.println(GetTime() + ": Created - World");
