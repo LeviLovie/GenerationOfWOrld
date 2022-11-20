@@ -2,11 +2,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -14,13 +10,15 @@ public class Window extends JPanel {
     private World world;
     private int tileSize;
     Color[][] worldArray;
+    private GenerateMethods generateMethods;
 
     public Window() {
         System.out.println(GetTime() + ": Created - Window");
         setLayout(null);
 
         world = new World(false, false);
-        creatingWorldArray();
+        generateMethods = new GenerateMethods();
+        creatingWorldArray(695, 695);
         calculateValuesForScreen();
         world.RandomArray();
 
@@ -43,7 +41,6 @@ public class Window extends JPanel {
         timer.setDelay(17);
         timer.start();
     }
-
     private void preferencesCreate() {
         System.out.println(GetTime() + ": Start - preferencesCreate()");
         JPanel preferences = new JPanel();
@@ -55,145 +52,78 @@ public class Window extends JPanel {
 
         JButton DayNightLandWaterGenerate = new JButton("Day-Night Land-Water Generate");
         DayNightLandWaterGenerate.addActionListener(e -> {
-            Color[][] array = DayNightLandWater();
+            Color[][] array = generateMethods.dayNightLandWater(this.world.GetWorldArray(), 500);
             this.world.SetWorldArray(array);
+            calculateValuesForScreen();
             revalidate();
         });
         panelDayNight.add(DayNightLandWaterGenerate);
 
         JButton PerlinNoiseLandWaterGenerate = new JButton("Perlin-Noise Land-Water");
         PerlinNoiseLandWaterGenerate.addActionListener(e -> {
-            Color[][] array = PerlinNoiseLandWater();
+            BufferedImage result = generateMethods.PerlinNoiseLandWater(this.world.GetWorldArray());
+//            showImageWindow(result, result.getWidth(), result.getHeight());
+            Color[][] array = new Color[this.world.GetWorldArray().length][this.world.GetWorldArray()[0].length];
+            for (int y = 0; y < result.getHeight(); y++) {
+                for (int x = 0; x < result.getHeight(); x++) {
+                    Color color = new Color(result.getRGB(x, y));
+                    int grey = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
+                    if (grey < percentRGB(5)) {array[y][x] = new Color(2, 30, 40);}
+                    else if (grey < percentRGB(10)) {array[y][x] = new Color(2, 30, 55);}
+                    else if (grey < percentRGB(15)) {array[y][x] = new Color(3, 44, 80);}
+                    else if (grey < percentRGB(20)) {array[y][x] = new Color(4, 60, 100);}
+                    else if (grey < percentRGB(25)) {array[y][x] = new Color(5, 71, 124);}
+                    else if (grey < percentRGB(30)) {array[y][x] = new Color(9, 95, 164);}
+                    else if (grey < percentRGB(35)) {array[y][x] = new Color(20, 125, 200);}
+                    else if (grey < percentRGB(45)) {array[y][x] = new Color(33, 150, 243);}
+                    else if (grey < percentRGB(50)) {array[y][x] = new Color(0, 188, 212);}
+                    else if (grey < percentRGB(55)) {array[y][x] = new Color(255, 239, 59);}
+                    else if (grey < percentRGB(60)) {array[y][x] = new Color(139, 195, 74);}
+                    else if (grey < percentRGB(65)) {array[y][x] = new Color(100, 150, 50);}
+                    else if (grey < percentRGB(70)) {array[y][x] = new Color(75, 130, 40);}
+                    else if (grey < percentRGB(75)) {array[y][x] = new Color(40, 100, 30);}
+                    else if (grey < percentRGB(80)) {array[y][x] = new Color(20, 75, 25);}
+                    else if (grey < percentRGB(85)) {array[y][x] = new Color(100, 100, 100);}
+                    else if (grey < percentRGB(90)) {array[y][x] = new Color(150, 150, 150);}
+                    else if (grey < percentRGB(95)) {array[y][x] = new Color(200, 200, 200);}
+                    else if (grey < percentRGB(100)) {array[y][x] = new Color(255, 255, 255);}
+                }
+            }
             this.world.SetWorldArray(array);
+            calculateValuesForScreen();
             revalidate();
         });
         panelDayNight.add(PerlinNoiseLandWaterGenerate);
 
         add(preferences, null);
     }
-    private Color[][] dayNightLandWater() {
-        System.out.println(GetTime() + ": Start - DayNightLandWater()");
-        Color[][] localWorldArrayColor = this.world.GetWorldArray();
-        int[][] localWorldArray = new int[localWorldArrayColor.length][localWorldArrayColor[0].length];
-
-        for (int y = 0; y < localWorldArray.length; y++) {
-            for (int x = 0; x < localWorldArray[y].length; x++) {
-                int rand = this.world.rand(0, 2);
-                if (rand == 0) {
-                    localWorldArray[y][x] = 0;
-                } else if (rand == 1) {
-                    localWorldArray[y][x] = 1;
-                }
-            }
-        }
-
-        int tile;
-        int friends;
-        int animys;
-        int height;
-        int width;
-        for (int t = 0; t < 100; t++) {
-            for (int t2 = 0; t2 < (localWorldArray.length * localWorldArray[0].length) / 2; t2++) {
-                height = this.world.rand(0, localWorldArray.length);
-                width = this.world.rand(0, localWorldArray[0].length);
-
-                tile = localWorldArray[height][width];
-                friends = 0;
-                animys = 0;
-                if (tile == 0) {
-                    try {
-                        if (localWorldArray[height - 1][width - 1] == 1) {animys++;}
-                        if (localWorldArray[height - 1][width] == 1) {animys++;}
-                        if (localWorldArray[height - 1][width + 1] == 1) {animys++;}
-
-                        if (localWorldArray[height][width - 1] == 1) {animys++;}
-                        if (localWorldArray[height][width] == 1) {animys++;}
-                        if (localWorldArray[height][width + 1] == 1) {animys++;}
-
-                        if (localWorldArray[height + 1][width] == 1) {animys++;}
-                        if (localWorldArray[height + 1][width] == 1) {animys++;}
-                        if (localWorldArray[height + 1][width + 1] == 1) {animys++;}
-                    } catch (Exception ignored) {}
-                } else if (tile == 1) {
-                    try {
-                        if (localWorldArray[height - 1][width - 1] == 0) {friends++;}
-                        if (localWorldArray[height - 1][width] == 0) {friends++;}
-                        if (localWorldArray[height - 1][width + 1] == 0) {friends++;}
-
-                        if (localWorldArray[height][width - 1] == 0) {friends++;}
-                        if (localWorldArray[height][width] == 0) {friends++;}
-                        if (localWorldArray[height][width + 1] == 0) {friends++;}
-
-                        if (localWorldArray[height + 1][width] == 0) {friends++;}
-                        if (localWorldArray[height + 1][width] == 0) {friends++;}
-                        if (localWorldArray[height + 1][width + 1] == 0) {friends++;}
-                    } catch (Exception ignored) {}
-                }
-                if (tile == 1) {
-                    if (friends == 3 || friends == 6 || friends == 7 || friends == 8) {
-                        localWorldArray[height][width] = 0;
-                    }
-                } else if (tile == 0) {
-                     if (animys == 3 || animys == 6 || animys == 7 || animys == 8) {
-                        localWorldArray[height][width] = 1;
-                    }
-                }
-            }
-        }
-
-        for (int y = 0; y < localWorldArray.length; y++) {
-            for (int x = 0; x < localWorldArray[y].length; x++) {
-                if (localWorldArray[y][x] == 1) {
-                    localWorldArrayColor[y][x] = new Color(139, 195, 74);
-                } else if (localWorldArray[y][x] == 0) {
-                    localWorldArrayColor[y][x] = new Color(33, 150, 243);
-                }
-            }
-        }
-
-        return localWorldArrayColor;
+    private int percentRGB(int source) {
+        return (source * 255) / 100;
     }
-    public int[][] createWorld(int width, int height) {
-        return generateOctavedSimplexNoise(width, height);
-    }
+    public static void showImageWindow(Image image, int width, int height) {
+        JFrame frame = new JFrame();
+        frame.setSize(width, height);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JLabel picLabel = new JLabel(new ImageIcon(image));
 
-    private int[][] generateOctavedSimplexNoise(int width, int height) {
-        double[][] totalNoise = new double[width][height];
-        double layerFrequency = 1;
-        double layerWeight = 1;
-        double weightSum = 0;
+        BorderLayout borderLayout = new BorderLayout();
+        frame.getContentPane().setLayout(borderLayout);
+        frame.getContentPane().add(picLabel, BorderLayout.CENTER);
 
-        // Summing up all octaves, the whole expression makes up a weighted average
-        // computation where the noise with the lowest frequencies have the least effect
-
-        for (int octave = 0; octave < 2; octave++) {
-            // Calculate single layer/octave of simplex noise, then add it to total noise
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    totalNoise[x][y] += SimplexNoise.noise(x * layerFrequency, y * layerFrequency) * layerWeight;
-                }
-            }
-
-            // Increase variables with each incrementing octave
-            layerFrequency *= 2;
-            weightSum += layerWeight;
-            layerWeight *= ROUGHNESS;
-
-        }
-        return totalNoise;
+        frame.setVisible(true);
     }
     private void calculateValuesForScreen() {
         System.out.println(GetTime() + ": Start - calculateValuesForScreen()");
         tileSize = (int) Math.floor(695 / this.world.GetWorldArray().length);
         this.worldArray = world.GetWorldArray();
     }
-    private void creatingWorldArray() {
+    private void creatingWorldArray(int Height, int Width) {
         System.out.println(GetTime() + ": Start - calculateValuesForScreen()");
 //        create: true - auto generate world array, 100x100
 //        print: true - print result
         world = new World(false, false);
 //        print: true - print result
-        world.Create(100, 100, false);
+        world.Create(Height, Width, false);
     }
     @Override
     protected void paintComponent(Graphics g) {
@@ -243,6 +173,18 @@ class World {
         for (Color[] colors : this.worldArray) {
             for (int x = 0; x < colors.length; x++) {
                 if (x != worldArray.length - 1) {
+                    System.out.print(colors[x] + " ");
+                } else {
+                    System.out.println(colors[x]);
+                }
+            }
+        }
+    }
+    public void Print2(Color[][] Array) {
+        System.out.println(GetTime() + ": Start - World.Print2()");
+        for (Color[] colors : Array) {
+            for (int x = 0; x < colors.length; x++) {
+                if (x != Array.length - 1) {
                     System.out.print(colors[x] + " ");
                 } else {
                     System.out.println(colors[x]);
