@@ -1,94 +1,129 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class GenerateMethods {
-    public Color[][] dayNightLandWater(Color[][] WorldArray) {
+    public void Print2(Color[][] Array) {
+        System.out.println(GetTime() + ": Start - World.Print2()");
+        for (Color[] colors : Array) {
+            for (int x = 0; x < colors.length; x++) {
+                if (x != Array.length - 1) {
+                    System.out.print(colors[x] + " ");
+                } else {
+                    System.out.println(colors[x]);
+                }
+            }
+        }
+    }
+    public void Print2Int(int[][] Array) {
+        System.out.println(GetTime() + ": Start - World.Print2()");
+        for (int[] ints : Array) {
+            for (int x = 0; x < ints.length; x++) {
+                if (x != Array.length - 1) {
+                    System.out.print(ints[x] + " ");
+                } else {
+                    System.out.println(ints[x]);
+                }
+            }
+        }
+    }
+    public Color[][] dayNightLandWater(Color[][] WorldArray, int[] rules) {
+//        rules = new int[] {3, 6, 7, 8};
+//        Print2(WorldArray);
         Color[][] localWorldArray = WorldArray;
+        int[][] localWorldArrayInt = new int[WorldArray.length][WorldArray[0].length];
 
-        Color tile;
-        int days;
-        int nightes;
+        for (int y = 0; y < WorldArray.length; y++) {
+            for (int x = 0; x < WorldArray[0].length; x++) {
+                if (WorldArray[y][x].getRGB() == new Color(0, 0, 0).getRGB()) {
+                    localWorldArrayInt[y][x] = 0;
+//                    System.out.println(0);
+                } else if (WorldArray[y][x].getRGB() == new Color(255, 255, 255).getRGB()) {
+                    localWorldArrayInt[y][x] = 1;
+//                    System.out.println(1);
+                }
+            }
+        }
+//        Print2Int(localWorldArrayInt);
+
+//        System.out.println(Arrays.toString(localWorldArrayInt[0]));
+
+        int tile;
+        int night;
+        int day;
         int height;
         int width;
 
-        for (int t2 = 0; t2 < (localWorldArray.length * localWorldArray[0].length) / 2; t2++) {
-            height = rand(0, localWorldArray.length);
-            width = rand(0, localWorldArray[0].length);
+        for (int t2 = 0; t2 < (localWorldArrayInt.length * localWorldArrayInt[0].length) / 2; t2++) {
+            height = rand(0, localWorldArrayInt.length);
+            width = rand(0, localWorldArrayInt[0].length);
 
-            tile = localWorldArray[height][width];
-            days = 0;
-            nightes = 0;
-//            if (Objects.equals(tile, new Color(0, 0, 0))) {
-//                for (int i = -1; i < 1; i++) {
-//                    for (int j = -1; j < 1; j++) {
-//                        try {
-//                            if (Objects.equals(
-//                                    localWorldArray[height + i][width + j], new Color(255, 255, 255)
-//                            )) {days++;}
-//                        } catch (Exception ignored) {}
-//                    }
-//                }
-//            } else if (Objects.equals(tile, new Color(255, 255, 255))) {
-//                for (int i = -1; i < 1; i++) {
-//                    for (int j = -1; j < 1; j++) {
-//                        try {
-//                            if (Objects.equals(localWorldArray[height + i][width + j], new Color(0, 0, 0)
-//                            )) {nightes++;}
-//                        } catch (Exception ignored) {}
-//                    }
-//                }
-//            }
-            if (Objects.equals(tile, new Color(0, 0, 0))) {
+            tile = localWorldArrayInt[height][width];
+            night = 0;
+            day = 0;
+            if (tile == 0) {
                 try {
-                    if (Objects.equals(localWorldArray[height - 1][width - 1], new Color(255, 255, 255))) {days++;}
-                    if (Objects.equals(localWorldArray[height - 1][width], new Color(255, 255, 255))) {days++;}
-                    if (Objects.equals(localWorldArray[height - 1][width + 1], new Color(255, 255, 255))) {days++;}
+                    if (localWorldArrayInt[height - 1][width - 1] == 1) {day++;}
+                    if (localWorldArrayInt[height - 1][width] == 1) {day++;}
+                    if (localWorldArrayInt[height - 1][width + 1] == 1) {day++;}
 
-                    if (Objects.equals(localWorldArray[height][width - 1], new Color(255, 255, 255))) {days++;}
-                    if (Objects.equals(localWorldArray[height][width], new Color(255, 255, 255))) {days++;}
-                    if (Objects.equals(localWorldArray[height][width + 1], new Color(255, 255, 255))) {days++;}
+                    if (localWorldArrayInt[height][width - 1] == 1) {day++;}
+                    if (localWorldArrayInt[height][width] == 1) {day++;}
+                    if (localWorldArrayInt[height][width + 1] == 1) {day++;}
 
-                    if (Objects.equals(localWorldArray[height + 1][width], new Color(255, 255, 255))) {days++;}
-                    if (Objects.equals(localWorldArray[height + 1][width], new Color(255, 255, 255))) {days++;}
-                    if (Objects.equals(localWorldArray[height + 1][width + 1], new Color(255, 255, 255))) {days++;}
-
-                    if (days == 3 || days == 6 || days == 7 || days == 8) {
-                        localWorldArray[height][width] = new Color(0, 0, 0);
-                    } else {
-                        localWorldArray[height][width] = new Color(255, 255, 255);
-                    }
+                    if (localWorldArrayInt[height + 1][width] == 1) {day++;}
+                    if (localWorldArrayInt[height + 1][width] == 1) {day++;}
+                    if (localWorldArrayInt[height + 1][width + 1] == 1) {day++;}
                 } catch (Exception ignored) {}
-            } else if (Objects.equals(tile, new Color(255, 255, 255))) {
+            } else if (tile == 1) {
                 try {
-                    if (Objects.equals(localWorldArray[height - 1][width - 1], new Color(0, 0, 0))) {nightes++;}
-                    if (Objects.equals(localWorldArray[height - 1][width], new Color(0, 0, 0))) {nightes++;}
-                    if (Objects.equals(localWorldArray[height - 1][width + 1], new Color(0, 0, 0))) {nightes++;}
+                    if (localWorldArrayInt[height - 1][width - 1] == 0) {night++;}
+                    if (localWorldArrayInt[height - 1][width] == 0) {night++;}
+                    if (localWorldArrayInt[height - 1][width + 1] == 0) {night++;}
 
-                    if (Objects.equals(localWorldArray[height][width - 1], new Color(0, 0, 0))) {nightes++;}
-                    if (Objects.equals(localWorldArray[height][width], new Color(0, 0, 0))) {nightes++;}
-                    if (Objects.equals(localWorldArray[height][width + 1], new Color(0, 0, 0))) {nightes++;}
+                    if (localWorldArrayInt[height][width - 1] == 0) {night++;}
+                    if (localWorldArrayInt[height][width] == 0) {night++;}
+                    if (localWorldArrayInt[height][width + 1] == 0) {night++;}
 
-                    if (Objects.equals(localWorldArray[height + 1][width], new Color(0, 0, 0))) {nightes++;}
-                    if (Objects.equals(localWorldArray[height + 1][width], new Color(0, 0, 0))) {nightes++;}
-                    if (Objects.equals(localWorldArray[height + 1][width + 1], new Color(0, 0, 0))) {nightes++;}
-
-                    if (nightes == 3 || nightes == 6 || nightes == 7 || nightes == 8) {
-                        localWorldArray[height][width] = new Color(0, 0, 0);
-                    } else {
-                        localWorldArray[height][width] = new Color(255, 255, 255);
+                    if (localWorldArrayInt[height + 1][width] == 0) {night++;}
+                    if (localWorldArrayInt[height + 1][width] == 0) {night++;}
+                    if (localWorldArrayInt[height + 1][width + 1] == 0) {night++;}
+                } catch (Exception ignored) {}
+            }
+            if (tile == 1) {
+//                System.out.println(night + " - " + rules[0]);
+                for (int i = 0; i < rules.length; i++) {
+                    if (night == rules[i]) {
+                        localWorldArrayInt[height][width] = 0;
                     }
-                } catch (Exception e) {
-
+                }
+            } else if (tile == 0) {
+                for (int i = 0; i < rules.length; i++) {
+                    if (day == rules[i]) {
+                        localWorldArrayInt[height][width] = 1;
+                    }
                 }
             }
-
-            System.out.println("tile: " + tile + " days: " + days + " nightes: " + nightes);
         }
+
+        for (int y = 0; y < localWorldArray.length; y++) {
+            for (int x = 0; x < localWorldArray[y].length; x++) {
+                if (localWorldArrayInt[y][x] == 1) {
+                    localWorldArray[y][x] = new Color(255, 255, 255);
+                } else if (localWorldArrayInt[y][x] == 0) {
+                    localWorldArray[y][x] = new Color(0, 0, 0);
+                }
+            }
+        }
+
         return localWorldArray;
     }
     public BufferedImage PerlinNoiseLandWater(Color[][] WorldArray) throws IOException {

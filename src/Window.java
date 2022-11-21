@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,7 +23,7 @@ public class Window extends JPanel {
 
         world = new World(false, false);
         generateMethods = new GenerateMethods();
-        creatingWorldArray(69, 69);
+        creatingWorldArray(100, 100);
         calculateValuesForScreen();
         world.RandomArray();
 
@@ -56,8 +57,13 @@ public class Window extends JPanel {
         JButton DayNightLandWaterGenerate = new JButton("Day-Night Land-Water Generate");
         DayNightLandWaterGenerate.addActionListener(e -> {
 //            Color[][] array = generateMethods.dayNightLandWater(this.world.GetWorldArray(), 500);
-            dayNightLandWaterManager(250);
+            dayNightLandWaterManager(500, new int[] {3, 6, 7, 8});
             revalidate();
+        });
+        panelDayNight.add(DayNightLandWaterGenerate);
+
+        JButton Save = new JButton("Save");
+        DayNightLandWaterGenerate.addActionListener(e -> {
         });
         panelDayNight.add(DayNightLandWaterGenerate);
 
@@ -85,6 +91,7 @@ public class Window extends JPanel {
                     else if (grey < percentRGB(45)) {array[y][x] = new Color(33, 150, 243);}
                     else if (grey < percentRGB(50)) {array[y][x] = new Color(0, 188, 212);}
                     else if (grey < percentRGB(55)) {array[y][x] = new Color(255, 239, 59);}
+//                    else if (grey < percentRGB(55)) {array[y][x] = new Color(255, 0, 0);}
                     else if (grey < percentRGB(60)) {array[y][x] = new Color(139, 195, 74);}
                     else if (grey < percentRGB(65)) {array[y][x] = new Color(100, 150, 50);}
                     else if (grey < percentRGB(70)) {array[y][x] = new Color(75, 130, 40);}
@@ -104,27 +111,27 @@ public class Window extends JPanel {
 
         add(preferences, null);
     }
-    private void dayNightLandWaterManager(int times) {
-        times = 250;
+    private void dayNightLandWaterManager(int times, int[] rules) {
+        Color[][] array = this.world.GetWorldArray();
 
         for (int y = 0; y < this.world.GetWorldArray().length; y++) {
             for (int x = 0; x < this.world.GetWorldArray()[y].length; x++) {
                 int rand = this.world.rand(0, 2);
                 if (rand == 0) {
-                    this.world.SetToWorldArray(x, y, new Color(0, 0, 0));
-                } else if (rand == 1) {
-                    this.world.SetToWorldArray(x, y, new Color(255, 255, 255));
+                    array[x][y] = new Color(0, 0, 0);
+                } else {
+                    array[x][y] = new Color(255, 255, 255);
                 }
             }
         }
+//        this.world.Print2(array);
         calculateValuesForScreen2();
         revalidate();
 
 //        try {Thread.sleep(1);} catch (InterruptedException e) {throw new RuntimeException(e);}
         for (int t = 0; t < times; t++) {
-            Color[][] array = generateMethods.dayNightLandWater(this.world.GetWorldArray());
-//            this.world.Print2(array);
-            this.world.SetWorldArray(array);
+            Color[][] array2 = generateMethods.dayNightLandWater(array, rules);
+            this.world.SetWorldArray(array2);
             calculateValuesForScreen2();
             revalidate();
         }

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 public class Main extends JFrame {
     public Main() {
         JFrame frame = new JFrame();
+        ImageIcon img = new ImageIcon("icon.png");
+        frame.setIconImage(img.getImage());
         frame.setTitle("Generating of World");
         frame.setSize(1280, 720);
         frame.setLocation(0, 0);
