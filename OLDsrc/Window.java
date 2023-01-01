@@ -23,7 +23,7 @@ public class Window extends JPanel {
 
         world = new World(false, false);
         generateMethods = new GenerateMethods();
-        creatingWorldArray(100, 100);
+        creatingWorldArray(695, 695);
         calculateValuesForScreen();
         world.RandomArray();
 
