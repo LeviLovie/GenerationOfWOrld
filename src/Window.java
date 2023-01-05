@@ -23,7 +23,7 @@ public class Window extends JPanel {
 
         world = new World(false, false);
         generateMethods = new GenerateMethods();
-        creatingWorldArray(100, 100);
+        creatingWorldArray(10000, 10000);
         calculateValuesForScreen();
         world.RandomArray();
 
@@ -106,6 +106,18 @@ public class Window extends JPanel {
             this.world.SetWorldArray(array);
             calculateValuesForScreen();
             revalidate();
+
+            BufferedImage result2 = new BufferedImage(result.getWidth(), result.getHeight(), BufferedImage.TYPE_INT_RGB);
+            for (int y = 0; y < result.getHeight(); y++) {
+                for (int x = 0; x < result.getHeight(); x++) {
+                    result2.setRGB(x, y, array[y][x].getRGB());
+                }
+            }
+            try {
+                ImageIO.write(result2, "png", new java.io.File("PerlinNoiseLandWater5.png"));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
         panelDayNight.add(PerlinNoiseLandWaterGenerate);
 
